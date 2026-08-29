@@ -32,7 +32,7 @@ KEYWORDS = [
 ]
 
 # السطر الصحيح للاتصال بالبوت باستخدام التوكن مباشرة
-client = TelegramClient('session_name', API_ID, API_HASH).start(bot=BOT_TOKEN)
+client = TelegramClient('session_name', API_ID, API_HASH).start(bot_token=BOT_TOKEN)
 
 async def resolve_subscribers():
     resolved_ids = []
