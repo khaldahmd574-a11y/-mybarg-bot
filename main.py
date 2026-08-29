@@ -22,7 +22,7 @@ SUBSCRIBERS_USERNAMES = [
 
 KEYWORDS = [
     "جازان", "صبيا", "خضيره", "رديس", "القُمري",
-    "الدرب", "صامطه", "مرحوه", "المضايا", "الحقل", "بيت الرومسي",
+    "الدرب", "صامطه", "مرجوه", "المضايا", "الحقل", "بيت الرومسي",
     "البدء", "المشحراه", "المضايا", "الراشد", "ماك", "كادي", "المجمع",
     "مخطط", "احتاج", "ابغى", "تفضل", "مين",
     "يوصل", "تروح", "ابتسام",
@@ -31,8 +31,8 @@ KEYWORDS = [
     "اني", "ياغذي", "السلام", "التوصيل", "مغوار", "مندوب", "طلب", "طلبية"
 ]
 
-# السطر الصحيح للاتصال بالبوت باستخدام التوكن مباشرة
-client = TelegramClient('session_name', API_ID, API_HASH).start(bot_token=BOT_TOKEN)
+# تعريف العميل مع ضبط حلقة الأحداث وتوكن البوت لتجنب أي أخطاء
+client = TelegramClient('session_name', API_ID, API_HASH, loop=asyncio.get_event_loop()).start(bot_token=BOT_TOKEN)
 
 async def resolve_subscribers():
     resolved_ids = []
@@ -59,7 +59,7 @@ async def monitor_groups(event):
             chat_title = getattr(chat, 'title', 'مجموعة')
             
             alert_text = (
-                f"🚨 <b>طلب جديد لم رصده 🔍</b>\n\n"
+                f"🚨 <b>طلب جديد تم رصده 🔍</b>\n\n"
                 f"👤 <b>المنسق:</b> {sender_name}\n"
                 f"📍 <b>القروب:</b> {chat_title}\n\n"
                 f"📝 <b>النص:</b>\n{text}"
@@ -84,7 +84,7 @@ async def monitor_groups(event):
                 except Exception as e:
                     print(f"خطأ في إرسال الإشعار: {e}")
 
-# سيرفر وهمي لإرضاء موقع Render ومنع خطأ إغلاق البورت
+# سيرفر وهمي لإرضاء موقع Render ومنع مشكلة البورتات
 class SimpleHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
