@@ -7,10 +7,12 @@ except RuntimeError:
 import os
 from telethon import TelegramClient, events
 import requests
+from http.server import HTTPServer, BaseHTTPRequestHandler
+import threading
 
 API_ID = 39120728
-API_HASH = '1deec8393ce5aa05c54c0c7e280377d4'
-BOT_TOKEN = '8782796916:AAGKs4vgK6s302vNpRAJ_3lU0YwjOHR0ybA'
+API_HASH = '1deec8393ca5aa05c54c0c7e280377d4'
+BOT_TOKEN = '8782796916:AAGKs4vGK6s302vNpRAJ_3lU0YwJOHR8ybA'
 
 SUBSCRIBERS_USERNAMES = [
     "abood1317",
@@ -19,17 +21,19 @@ SUBSCRIBERS_USERNAMES = [
 ]
 
 KEYWORDS = [
-    "جيزان", "جازان", "ضمد", "صبيا", "خضيره", "رديس", "القمري",
-    "الدرب", "صامطه", "مزهره", "المضايا", "الحقل", "بيت الرومنسي",
-    "البيك", "الخضراء", "الطوال", "المضايا", "الراشد", "ماك", "كادي", "المجمع",
-    "محليه", "لمحليه", "مخطط", "احتاج", "ابغى", "ابغا", "مين",
-    "يرجعني", "يجيب", "يوصل", "توصل", "يروح", "تروح", "ابتسام",
-    "الزاكي", "راجع", "راجعه", "بيش", "السوق", "دوامات", "يلتزم",
-    "اعطيه", "رعشه", "الشعفوليه", "المطار", "حي", "فيه", "توصيل",
-    "الي", "ياخذني", "السلام", "توصيل", "مشوار", "مندوب", "طلب", "طلبية"
+    "جازان", "صبيا", "خضيره", "رديس", "القُمري",
+    "الدرب", "صامطه", "مرحوه", "المضايا", "الحقل", "بيت الرومسي",
+    "البدء", "المشحراه", "المضايا", "الراشد", "ماك", "كادي", "المجمع",
+    "مخطط", "احتاج", "ابغى", "تفضل", "مين",
+    "يوصل", "تروح", "ابتسام",
+    "اراجع", "راجع", "نبغى", "السوق", "دومات", "باازم",
+    "اعطه", "وعطه", "الشغفوله", "امطار", "حي", "فيه", "توصيل",
+    "اني", "ياغذي", "السلام", "التوصيل", "مغوار", "مندوب", "طلب", "طلبية"
 ]
 
+# السطر الصحيح للاتصال بالبوت باستخدام التوكن مباشرة
 client = TelegramClient('session_name', API_ID, API_HASH).start(bot=BOT_TOKEN)
+
 async def resolve_subscribers():
     resolved_ids = []
     for username in SUBSCRIBERS_USERNAMES:
@@ -37,7 +41,7 @@ async def resolve_subscribers():
             user = await client.get_entity(username)
             resolved_ids.append(user.id)
         except Exception as e:
-            print(f"تعذر جلب أيدي المعرف {username}: {e}")
+            print(f"تعذر جلب المعرف {username}: {e}")
     return resolved_ids
 
 @client.on(events.NewMessage(incoming=True))
@@ -55,10 +59,10 @@ async def monitor_groups(event):
             chat_title = getattr(chat, 'title', 'مجموعة')
             
             alert_text = (
-                f"📩 <b>طلب جديد تم رصده:</b>\n\n"
-                f"👤 <b>العضو:</b> {sender_name}\n"
+                f"🚨 <b>طلب جديد لم رصده 🔍</b>\n\n"
+                f"👤 <b>المنسق:</b> {sender_name}\n"
                 f"📍 <b>القروب:</b> {chat_title}\n\n"
-                f"💬 <b>النص:</b>\n{text}"
+                f"📝 <b>النص:</b>\n{text}"
             )
             
             button_url = f"https://t.me/{sender_username}" if sender_username else None
@@ -73,14 +77,25 @@ async def monitor_groups(event):
                 }
                 if button_url:
                     payload["reply_markup"] = {
-                        "inline_keyboard": [[{"text": "📬 فتح المحادثة", "url": button_url}]]
+                        "inline_keyboard": [[{"text": "📨 فتح المحادثة", "url": button_url}]]
                     }
                 try:
                     requests.post(url, json=payload)
                 except Exception as e:
-                    print(f"خطأ في إرسال البوت للمشترك: {e}")
+                    print(f"خطأ في إرسال الإشعار: {e}")
 
-print("جاري تشغيل نظام رصد وتوزيع الطلبات...")
-client.start()
+# سيرفر وهمي لإرضاء موقع Render ومنع خطأ إغلاق البورت
+class SimpleHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is alive!")
+
+def run_web():
+    port = int(os.environ.get("PORT", 10000))
+    server = HTTPServer(('0.0.0.0', port), SimpleHandler)
+    server.serve_forever()
+
+threading.Thread(target=run_web, daemon=True).start()
+
 client.run_until_disconnected()
-
