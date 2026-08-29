@@ -31,8 +31,8 @@ KEYWORDS = [
     "اني", "ياغذي", "السلام", "التوصيل", "مغوار", "مندوب", "طلب", "طلبية"
 ]
 
-# تعريف العميل مع ضبط حلقة الأحداث وتوكن البوت لتجنب أي أخطاء
-client = TelegramClient('session_name', API_ID, API_HASH, loop=asyncio.get_event_loop()).start(bot_token=BOT_TOKEN)
+# تعريف وتسجيل دخول البوت بالتوكن مباشرة بدون مشاكل start
+client = TelegramClient('session_name', API_ID, API_HASH)
 
 async def resolve_subscribers():
     resolved_ids = []
@@ -84,7 +84,7 @@ async def monitor_groups(event):
                 except Exception as e:
                     print(f"خطأ في إرسال الإشعار: {e}")
 
-# سيرفر وهمي لإرضاء موقع Render ومنع مشكلة البورتات
+# سيرفر وهمي لإرضاء موقع Render
 class SimpleHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
@@ -98,4 +98,6 @@ def run_web():
 
 threading.Thread(target=run_web, daemon=True).start()
 
-client.run_until_disconnected()
+# تشغيل البوت باستخدام التوكن مباشرة
+with client:
+    client.run_until_disconnected()
