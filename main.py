@@ -10,10 +10,14 @@ import requests
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import threading
 
+# بيانات تطبيقك الشخصي من تيليجرام
 API_ID = 39120728
 API_HASH = '1deec8393ca5aa05c54c0c7e280377d4'
+
+# توكن البوت المسؤول عن إرسال التنبيهات في الخاص
 BOT_TOKEN = '8782796916:AAGKs4vGK6s302vNpRAJ_3lU0YwJOHR8ybA'
 
+# معرفات الأشخاص الذين سيستلمون التنبيهات
 SUBSCRIBERS_USERNAMES = [
     "abood1317",
     "shaybq",
@@ -31,8 +35,8 @@ KEYWORDS = [
     "اني", "ياغذي", "السلام", "التوصيل", "مغوار", "مندوب", "طلب", "طلبية"
 ]
 
-# تعريف العميل بدون استخدام start() نهائياً لتفادي أخطاء التوكن
-client = TelegramClient('session_name', API_ID, API_HASH)
+# ربط الكود بحسابك الشخصي (Userbot)
+client = TelegramClient('user_session', API_ID, API_HASH)
 
 async def resolve_subscribers():
     resolved_ids = []
@@ -84,12 +88,12 @@ async def monitor_groups(event):
                 except Exception as e:
                     print(f"خطأ في إرسال الإشعار: {e}")
 
-# سيرفر وهمي لإرضاء موقع Render
+# سيرفر وهمي لإرضاء متطلبات موقع Render وبقائه متصلاً
 class SimpleHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.end_headers()
-        self.wfile.write(b"Bot is alive!")
+        self.wfile.write(b"Userbot is alive!")
 
 def run_web():
     port = int(os.environ.get("PORT", 10000))
@@ -98,7 +102,6 @@ def run_web():
 
 threading.Thread(target=run_web, daemon=True).start()
 
-# تشغيل البوت وتسجيل الدخول بالتوكن حصرياً
-with client:
-    client.start(bot_token=BOT_TOKEN)
-    client.run_until_disconnected()
+# تشغيل الحساب الشخصي
+client.start()
+client.run_until_disconnected()
