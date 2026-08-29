@@ -29,7 +29,7 @@ KEYWORDS = [
     "الي", "ياخذني", "السلام", "توصيل", "مشوار", "مندوب", "طلب", "طلبية"
 ]
 
-client = TelegramClient('session_name', API_ID, API_HASH).start(bot_token=BOT_TOKEN)
+client = TelegramClient('session_name', API_ID, API_HASH).start(bot=BOT_TOKEN)
 
 async def resolve_subscribers():
     resolved_ids = []
