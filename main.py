@@ -31,7 +31,7 @@ KEYWORDS = [
     "اني", "ياغذي", "السلام", "التوصيل", "مغوار", "مندوب", "طلب", "طلبية"
 ]
 
-# تعريف وتسجيل دخول البوت بالتوكن مباشرة بدون مشاكل start
+# تعريف العميل بدون استخدام start() نهائياً لتفادي أخطاء التوكن
 client = TelegramClient('session_name', API_ID, API_HASH)
 
 async def resolve_subscribers():
@@ -98,6 +98,7 @@ def run_web():
 
 threading.Thread(target=run_web, daemon=True).start()
 
-# تشغيل البوت باستخدام التوكن مباشرة
+# تشغيل البوت وتسجيل الدخول بالتوكن حصرياً
 with client:
+    client.start(bot_token=BOT_TOKEN)
     client.run_until_disconnected()
